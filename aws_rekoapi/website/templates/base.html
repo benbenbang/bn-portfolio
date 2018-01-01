@@ -1,0 +1,169 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+<meta name="keywords" content=""> 
+<meta name="Author" content="Ben Chen">
+<meta name="Powered" content="Ben Chen">
+<meta name="copyright" content="Copyright ©  All Rights Reserved."> 
+<meta name="description" content="">
+<title>{% block head_title %}RekoFace{% endblock head_title %}</title>
+	
+	<!-- CSS  -->
+	<link href='{% static "css/bootstrap/css/bootstrap.min.css" %}' rel="stylesheet" media="screen">
+	<!-- Modernizer and IE specyfic files --> 
+	<!--<script src="js/modernizr.custom.js"></script>-->
+	
+</head>
+
+<body>
+	<h1 class="text-center">Face Reko
+		<small class="text-muted">Prototype v.0.5</small>
+	</h1>
+	<br>
+	<div class="container">
+		<div class="row">
+			<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+				<div id="image_captured"></div>
+				<br>
+				<div id="results"></div>
+				<!-- A button for taking snaps -->
+				<br>    
+				<form class="form" enctype="multipart/form-data">
+					<div class="row">
+						<div class="col-lg-6">
+							<p><strong>Click the checkbox to let us remember your face:</strong></p>
+							<div class="input-group">
+								<span class="input-group-addon">
+									<input type="checkbox" aria-label="Checkbox for following text input" id="checkAgreement" onclick="isChecked("checkAgreement");>
+								</span>
+								<span class="input-group-addon" id="sizing-addon2">@</span>
+								<input type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="sizing-addon2" autocomplete=False id="faceID">
+							</div>
+						</div>
+					</div>
+					<br>
+					<input type=button value="Register" onClick="register()" class="btn btn-primary">
+					<input type=button value="Rekongize" onClick="rekognize()" class="btn btn-primary">
+				</form>
+			</div>
+		
+			<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+				<p class="h5">Feedback from API: </p>
+				<blockquote class="blockquote">
+				<p class="mb-0" id="reko_results"></p>
+				</blockquote>
+			</div>
+		</div>
+	</div>
+
+{% block javascript %}
+	<!-- JAVASCRIPT  -->
+	<script src="http://code.jquery.com/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src='{% static "js/webcamjs/webcam.min.js" %}'></script>
+	<script type="text/javascript" src='{% static "css/bootstrap/js/bootstrap.js" %}'></script>
+	<!-- Register -->
+	<script language="JavaScript">
+		var response;
+		var faceID;
+		var data_uri;
+
+		$(function(){
+			var faceID;
+			var remember;
+			$('input:checkbox').click(function(){
+			  remember = $(this).attr('id');
+			  if($(this).is(':checked')){
+				// Checkbox is checked
+				alert("When you checked this box we will remember your user setting and your faceID! It will be secured safely.");
+				var faceID = document.getElementById("faceID");
+			  } else {
+				// Checkbox is NOT checked
+				alert("Cancel.");
+				var faceID;
+			  }
+			});
+		});
+
+		function register() {
+			// take snapshot and get image data
+			Webcam.snap(function(data_uri) {
+				// display results in page
+				document.getElementById('results').innerHTML = 
+					'<p><strong>Here is your image:</strong></p>' + 
+					'<img id="register_img" src="'+data_uri+'"/>';
+
+				$.ajax({
+					url: 'register/',
+					data: {
+						'faceID': faceID,
+					  	'b64text': data_uri,
+					},
+					dataType: 'json',
+					success: function (data) {
+						//alert("");
+						document.getElementById('reko_results').innerHTML = 
+							'<ul><li>Age: ' + data.Age + '</li>'
+							+ '<li>Gender: ' + data.Gender + '</li>'
+							+ '<li>Emotions: ' + data.Emotions + '</li>'
+							+ '<li>Smile: ' + data.Smile + '</li>'
+							+ '<li>Beard: ' + data.Beard + '</li>'
+							+ '<li>Mustache: ' + data.Mustache + '</li>'
+							+ '<li>Eyeglasses: ' + data.Eyeglasses + '</li>'
+							+ '<li>Sunglasses: ' + data.Sunglasses + '</li>'
+							+ '<li>EyesOpen: ' + data.EyesOpen + '</li>'
+							+ '<li>MouthOpen : ' + data.MouthOpen  + '</li>'
+							+ '<li>Brightness: ' + data.Brightness + '</li></ul>';
+					}
+				});
+			});
+		};
+	</script>
+
+	<!-- Register -->
+	<script language="JavaScript">
+		var response;
+		var faceID;
+
+		function rekognize() {
+			// take snapshot and get image data
+			Webcam.snap(function(data_uri) {
+				// display results in page
+				document.getElementById('results').innerHTML = 
+					'<p><strong>Here is your image:</strong></p>' + 
+					'<img id="register_img" src="'+data_uri+'"/>';
+					
+				$.ajax({
+					url: 'rekognize/',
+					data: {
+						'faceID': faceID,
+						'b64text': data_uri
+					},
+					dataType: 'json',
+					success: function (data) {
+						//alert(data['is_saved']);
+						document.getElementById('reko_results').innerHTML = 
+								'<ul><li>Response: ' + data.Response + '</li>'
+								+ '<li>Similarity: ' + data.similarity + '</li>'
+								+ '<li>Bool ' + data.knowIf + '</li>';
+					}
+				});
+			});
+		};	</script>
+
+	<!-- Configure a few settings and attach camera -->
+	<script language="JavaScript">
+		Webcam.set({
+			width: 320,
+			height: 240,
+			image_format: 'jpeg',
+			jpeg_quality: 90
+		});
+		Webcam.attach('#image_captured');
+	</script>
+{% endblock %}
+</body>
+</html>
