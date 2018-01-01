@@ -33,8 +33,8 @@ Portfolio
 │   ├── Q-learning cart
 │   └── Skip Grams
 └── mlnd
-	├── assets
-	├── README.md
-	└── term.pdf
+    ├── assets
+    ├── README.md
+    └── term.pdf
 ```
 
