@@ -6,17 +6,17 @@
 Portfolio
 ├── algo
 │   ├── adjMat
-│	│   ├── adjMat.cpp
-│	│   ├── adjMat.py
-│	│   └── graph_traversals
-│	│		└── gt.py
+│   │   ├── adjMat.cpp
+│   │   ├── adjMat.py
+│   │   └── graph_traversals
+│   │		└── gt.py
 │   ├── knapsackPB
-│	│	└── knapsack.py
+│   │	└── knapsack.py
 │   ├── metro
-│	│   ├── data
-│	│   ├── images
-|	|	├── metro.py
-│	│   └── README.md
+│   │   ├── data
+│   │   ├── images
+|   |	├── metro.py
+│   │   └── README.md
 │   └── README.md
 ├── aws_rekoapi
 │   ├── assets
