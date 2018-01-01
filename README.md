@@ -9,13 +9,13 @@ Portfolio
 │   │   ├── adjMat.cpp
 │   │   ├── adjMat.py
 │   │   └── graph_traversals
-│   │		└── gt.py
+│   │       └── gt.py
 │   ├── knapsackPB
-│   │	└── knapsack.py
+│   │   └── knapsack.py
 │   ├── metro
 │   │   ├── data
 │   │   ├── images
-|   |	├── metro.py
+│   │   ├── metro.py
 │   │   └── README.md
 │   └── README.md
 ├── aws_rekoapi
