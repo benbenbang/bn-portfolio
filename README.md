@@ -11,6 +11,7 @@ My endlessly curious about uncovering the patterns and knowledges that make the 
 - 3+ years specialize in retail industries, 2+ years in startups. 
 
 #### More about Ben:
+- [View my CV](https://github.com/benbenbang/bn-portfolio/blob/master/assets/CV/CV_BenCHEN.jpg)
 - [Github](https://github.com/benbenbang)
 - [LinkedIn](https://www.linkedin.com/in/benbenbang/)
 - [Blog](https://benbenbang.github.io)
