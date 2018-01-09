@@ -28,9 +28,11 @@ Portfolio
 │   ├── DCGAN
 │   ├── Face Generation
 │   ├── First Image Classification
+│   ├── Language Trainslation
 │   ├── Play with Autoencoder
 │   ├── Play with GANs
 │   ├── Q-learning cart
+│   ├── seq2seq
 │   └── Skip Grams
 └── mlnd
     ├── assets
