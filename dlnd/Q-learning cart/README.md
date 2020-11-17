@@ -71,7 +71,7 @@ Now, our Q value, $Q(s, a)$ is calculated by passing in a state to the network. 
 <img src="assets/q-network.png" width=550px>
 
 
-As I showed before, we can define our targets for training as $\hat{Q}(s,a) = r + \gamma \max{Q(s', a')}$. Then we update the weights by minimizing $(\hat{Q}(s,a) - Q(s,a))^2$. 
+As I showed before, we can define our targets for training as $\hat{Q}(s,a) = r + \gamma \max{Q(s', a')}$. Then we update the weights by minimizing $(\hat{Q}(s,a) - Q(s,a))^2$.
 
 For this Cart-Pole game, we have four inputs, one for each value in the state, and two outputs, one for each action. To get $\hat{Q}$, I'll first choose an action, then simulate the game using that action. This will get us the next state, $s'$, and the reward. With that, we can calculate $\hat{Q}$ then pass it back into the $Q$ network to run the optimizer and update the weights.
 
@@ -80,40 +80,40 @@ Below is my implementation of the Q-network. I used two fully connected layers w
 
 ```python
 class QNetwork:
-    def __init__(self, learning_rate=0.01, state_size=4, 
-                 action_size=2, hidden_size=10, 
+    def __init__(self, learning_rate=0.01, state_size=4,
+                 action_size=2, hidden_size=10,
                  name='QNetwork'):
         # state inputs to the Q-network
         with tf.variable_scope(name):
             self.inputs_ = tf.placeholder(tf.float32, [None, state_size], name='inputs')
-            
+
             # One hot encode the actions to later choose the Q-value for the action
             self.actions_ = tf.placeholder(tf.int32, [None], name='actions')
             one_hot_actions = tf.one_hot(self.actions_, action_size)
-            
+
             # Target Q values for training
             self.targetQs_ = tf.placeholder(tf.float32, [None], name='target')
-            
+
             # ReLU hidden layers
             self.fc1 = tf.contrib.layers.fully_connected(self.inputs_, hidden_size)
             self.fc2 = tf.contrib.layers.fully_connected(self.fc1, hidden_size)
 
             # Linear output layer
-            self.output = tf.contrib.layers.fully_connected(self.fc2, action_size, 
+            self.output = tf.contrib.layers.fully_connected(self.fc2, action_size,
                                                             activation_fn=None)
-            
+
             ### Train with loss (targetQ - Q)^2
             # output has length 2, for two actions. This lext line chooses
             # one value from output (per row) according to the one-hot encoded actions.
             self.Q = tf.reduce_sum(tf.multiply(self.output, one_hot_actions), axis=1)
-            
+
             self.loss = tf.reduce_mean(tf.square(self.targetQs_ - self.Q))
             self.opt = tf.train.AdamOptimizer(learning_rate).minimize(self.loss)
 ```
 
 ## Experience replay
 
-Reinforcement learning algorithms can have stability issues due to correlations between states. To reduce correlations when training, we can store the agent's experiences and later draw a random mini-batch of those experiences to train on. 
+Reinforcement learning algorithms can have stability issues due to correlations between states. To reduce correlations when training, we can store the agent's experiences and later draw a random mini-batch of those experiences to train on.
 
 Here, I'll create a `Memory` object that will store our experiences, our transitions $<s, a, r, s'>$. This memory will have a maxmium capacity, so we can keep newer experiences in memory while getting rid of older experiences. Then, I'll sample a random mini-batch of transitions $<s, a, r, s'>$ and train on those.
 
@@ -125,13 +125,13 @@ from collections import deque
 class Memory():
     def __init__(self, max_size = 1000):
         self.buffer = deque(maxlen=max_size)
-    
+
     def add(self, experience):
         self.buffer.append(experience)
-            
+
     def sample(self, batch_size):
-        idx = np.random.choice(np.arange(len(self.buffer)), 
-                               size=batch_size, 
+        idx = np.random.choice(np.arange(len(self.buffer)),
+                               size=batch_size,
                                replace=False)
         return [self.buffer[ii] for ii in idx]
 ```
@@ -172,7 +172,7 @@ gamma = 0.99                   # future reward discount
 
 # Exploration parameters
 explore_start = 1.0            # exploration probability at start
-explore_stop = 0.01            # minimum exploration probability 
+explore_stop = 0.01            # minimum exploration probability
 decay_rate = 0.0001            # expotentional decay rate for exploration prob
 
 # Network parameters
@@ -218,7 +218,7 @@ for ii in range(pretrain_length):
         next_state = np.zeros(state.shape)
         # Add experience to memory
         memory.add((state, action, reward, next_state))
-        
+
         # Start new episode
         env.reset()
         # Take one random step to get the pole and cart moving
@@ -241,7 +241,7 @@ rewards_list = []
 with tf.Session() as sess:
     # Initialize variables
     sess.run(tf.global_variables_initializer())
-    
+
     step = 0
     for ep in range(1, train_episodes):
         total_reward = 0
@@ -249,10 +249,10 @@ with tf.Session() as sess:
         while t < max_steps:
             step += 1
             # Uncomment this next line to watch the training
-            # env.render() 
-            
+            # env.render()
+
             # Explore or Exploit
-            explore_p = explore_stop + (explore_start - explore_stop)*np.exp(-decay_rate*step) 
+            explore_p = explore_stop + (explore_start - explore_stop)*np.exp(-decay_rate*step)
             if explore_p > np.random.rand():
                 # Make a random action
                 action = env.action_space.sample()
@@ -261,26 +261,26 @@ with tf.Session() as sess:
                 feed = {mainQN.inputs_: state.reshape((1, *state.shape))}
                 Qs = sess.run(mainQN.output, feed_dict=feed)
                 action = np.argmax(Qs)
-            
+
             # Take action, get new state and reward
             next_state, reward, done, _ = env.step(action)
-    
+
             total_reward += reward
-            
+
             if done:
                 # the episode ends so no next state
                 next_state = np.zeros(state.shape)
                 t = max_steps
-                
+
                 print('Episode: {}'.format(ep),
                       'Total reward: {}'.format(total_reward),
                       'Training loss: {:.4f}'.format(loss),
                       'Explore P: {:.4f}'.format(explore_p))
                 rewards_list.append((ep, total_reward))
-                
+
                 # Add experience to memory
                 memory.add((state, action, reward, next_state))
-                
+
                 # Start new episode
                 env.reset()
                 # Take one random step to get the pole and cart moving
@@ -291,27 +291,27 @@ with tf.Session() as sess:
                 memory.add((state, action, reward, next_state))
                 state = next_state
                 t += 1
-            
+
             # Sample mini-batch from memory
             batch = memory.sample(batch_size)
             states = np.array([each[0] for each in batch])
             actions = np.array([each[1] for each in batch])
             rewards = np.array([each[2] for each in batch])
             next_states = np.array([each[3] for each in batch])
-            
+
             # Train network
             target_Qs = sess.run(mainQN.output, feed_dict={mainQN.inputs_: next_states})
-            
+
             episode_ends = (next_states == np.zeros(states[0].shape)).all(axis=1)
             target_Qs[episode_ends] = (0, 0)
-            
+
             targets = rewards + gamma * np.max(target_Qs, axis=1)
 
             loss, _ = sess.run([mainQN.loss, mainQN.opt],
                                 feed_dict={mainQN.inputs_: states,
                                            mainQN.targetQs_: targets,
                                            mainQN.actions_: actions})
-        
+
     saver.save(sess, "checkpoints/cartpole.ckpt")
 
 ```
@@ -1327,8 +1327,8 @@ Below I'll plot the total rewards for each episode. I took a rolling average too
 import matplotlib.pyplot as plt
 
 def running_mean(x, N):
-    cumsum = np.cumsum(np.insert(x, 0, 0)) 
-    return (cumsum[N:] - cumsum[:-N]) / N 
+    cumsum = np.cumsum(np.insert(x, 0, 0))
+    return (cumsum[N:] - cumsum[:-N]) / N
 ```
 
 
@@ -1363,20 +1363,20 @@ test_max_steps = 400
 env.reset()
 with tf.Session() as sess:
     saver.restore(sess, tf.train.latest_checkpoint('checkpoints'))
-    
+
     for ep in range(1, test_episodes):
         t = 0
         while t < test_max_steps:
-            env.render() 
-            
+            env.render()
+
             # Get action from Q-network
             feed = {mainQN.inputs_: state.reshape((1, *state.shape))}
             Qs = sess.run(mainQN.output, feed_dict=feed)
             action = np.argmax(Qs)
-            
+
             # Take action, get new state and reward
             next_state, reward, done, _ = env.step(action)
-            
+
             if done:
                 t = test_max_steps
                 env.reset()

@@ -5,7 +5,7 @@
 	/* Based on JPEGCam: http://code.google.com/p/jpegcam/ */
 	/* Copyright (c) 2012 Joseph Huckaby */
 	/* Licensed under the MIT License */
-	
+
 	import flash.display.LoaderInfo;
 	import flash.display.Sprite;
 	import flash.display.StageAlign;
@@ -40,12 +40,12 @@
 		private var image_format:String;
 		private var fps:int;
 		private var flip_horiz:Boolean;
-		
+
 		public function Webcam() {
 			// class constructor
 			flash.system.Security.allowDomain("*");
 			var flashvars:Object = LoaderInfo(this.root.loaderInfo).parameters;
-			
+
 			video_width = Math.floor( flashvars.width );
 			video_height = Math.floor( flashvars.height );
 			dest_width = Math.floor( flashvars.dest_width );
@@ -54,18 +54,18 @@
 			image_format = flashvars.image_format;
 			fps = Math.floor( flashvars.fps );
 			flip_horiz = flashvars.flip_horiz == "true";
-			
+
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			// stage.scaleMode = StageScaleMode.EXACT_FIT; // Note: This breaks HD capture
-			
+
 			stage.align = StageAlign.TOP_LEFT;
 			stage.stageWidth = Math.max(video_width, dest_width);
 			stage.stageHeight = Math.max(video_height, dest_height);
-						
+
 			if (flashvars.new_user) {
 				Security.showSettings( SecurityPanel.PRIVACY );
 			}
-			
+
 			// Hack to auto-select iSight camera on Mac (JPEGCam Issue #5, submitted by manuel.gonzalez.noriega)
 			// From: http://www.squidder.com/2009/03/09/trick-auto-select-mac-isight-in-flash/
 			var cameraIdx:int = -1;
@@ -77,14 +77,14 @@
 			}
 			if (cameraIdx > -1) camera = Camera.getCamera( String(cameraIdx) );
 			else camera = Camera.getCamera();
-									
+
 			if (camera != null) {
 				camera.addEventListener(ActivityEvent.ACTIVITY, activityHandler);
 				camera.addEventListener(StatusEvent.STATUS, handleCameraStatus, false, 0, true);
 				video = new Video( Math.max(video_width, dest_width), Math.max(video_height, dest_height) );
 				video.attachCamera(camera);
 				addChild(video);
-				
+
 				if ((video_width < dest_width) && (video_height < dest_height)) {
 					video.scaleX = video_width / dest_width;
 					video.scaleY = video_height / dest_height;
@@ -94,18 +94,18 @@
 					video.scaleX *= -1;
 					video.x = video.width + video.x;
 				}
-				
+
 				camera.setQuality(0, 100);
 				camera.setKeyFrameInterval(10);
 				camera.setMode( Math.max(video_width, dest_width), Math.max(video_height, dest_height), fps );
-				
+
 				// only detect motion once, to determine when camera is "live"
 				camera.setMotionLevel( 1 );
-				
+
 				ExternalInterface.addCallback('_snap', snap);
 				ExternalInterface.addCallback('_configure', configure);
 				ExternalInterface.addCallback('_releaseCamera', releaseCamera);
-								
+
 				ExternalInterface.call('Webcam.flashNotify', 'flashLoadComplete', true);
 			}
 			else {
@@ -113,7 +113,7 @@
 				ExternalInterface.call('Webcam.flashNotify', "error", "No camera was detected.");
 			}
 		}
-		
+
 		public function configure(panel:String = SecurityPanel.CAMERA) {
 			// show configure dialog inside flash movie
 			Security.showSettings(panel);
@@ -122,11 +122,11 @@
 		private function activityHandler(event:ActivityEvent):void {
 			trace("activityHandler: " + event);
 			ExternalInterface.call('Webcam.flashNotify', 'cameraLive', true);
-			
+
 			// now disable motion detection (may help reduce CPU usage)
 			camera.setMotionLevel( 100 );
 		}
-		
+
 		private function handleCameraStatus(e:StatusEvent):void {
 			switch (e.code) {
 				case 'Camera.Muted': {
@@ -140,30 +140,30 @@
 				}
 			}
 		}
-		
+
 		public function snap() {
 			// take snapshot from camera, and upload if URL was provided
 			trace("in snap(), drawing to bitmap");
-			
+
 			// take snapshot, convert to jpeg, submit to server
 			bmpdata = new BitmapData( Math.max(video_width, dest_width), Math.max(video_height, dest_height) );
 			bmpdata.draw( video );
-			
+
 			if ((video_width > dest_width) && (video_height > dest_height)) {
 				// resize image downward before submitting
 				var tmpdata = new BitmapData(dest_width, dest_height);
-				
+
 				var matrix = new Matrix();
 				matrix.scale( dest_width / video_width, dest_height / video_height );
-				
+
 				tmpdata.draw( bmpdata, matrix, null, null, null, true ); // smoothing
 				bmpdata = tmpdata;
 			} // need resize
-			
+
 			trace("converting to " + image_format);
-		
+
 			var bytes:ByteArray;
-			
+
 			if (image_format == 'png') {
 				bytes = PNGEncoder.encode( bmpdata );
 			}
@@ -172,15 +172,15 @@
 				encoder = new JPGEncoder( jpeg_quality );
 				bytes = encoder.encode( bmpdata );
 			}
-			
+
 			trace("raw image length: " + bytes.length);
-		
+
 			var be = new Base64Encoder();
 			be.encodeBytes( bytes );
-			
+
 			var bstr = be.toString();
 			trace("b64 string length: " + bstr.length);
-			
+
 			return bstr;
 		}
 

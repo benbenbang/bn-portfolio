@@ -1,6 +1,6 @@
 ### Route Planner of Métro Paris
 
-It's a exercise about Graph theory. In this project, I implemented a route planner for métro Paris from **station x** to **station y** by **shortest way** or **quickest way**. Instead of using **A\***, I first implemented it in **Dijkstra's algorithms** for finding the "shortest" paths between nodes in this graph. 
+It's a exercise about Graph theory. In this project, I implemented a route planner for métro Paris from **station x** to **station y** by **shortest way** or **quickest way**. Instead of using **A\***, I first implemented it in **Dijkstra's algorithms** for finding the "shortest" paths between nodes in this graph.
 
 <u>For the quickest way</u>, it is trivial that we only need to have the time costs table between each stations. Noticed that for changing another line in same station, we simply assume that it will take 2 mins. Compared to Google map, the time consumption by using Dijkstra are not far from which is estimated by Google map. The main difference comes from the time of changing line might take.
 
@@ -9,6 +9,3 @@ It's a exercise about Graph theory. In this project, I implemented a route plann
 The console will show like the following image:
 
 <img src="images/route.png" style="zoom:50%">
-
-
-

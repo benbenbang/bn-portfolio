@@ -5,9 +5,9 @@
 
 ## Readings
 
-Here are the resources I used to build this project. 
+Here are the resources I used to build this project.
 
-* A really good [conceptual overview](http://mccormickml.com/2016/04/19/word2vec-tutorial-the-skip-gram-model/) of word2vec from Chris McCormick 
+* A really good [conceptual overview](http://mccormickml.com/2016/04/19/word2vec-tutorial-the-skip-gram-model/) of word2vec from Chris McCormick
 * [First word2vec paper](https://arxiv.org/pdf/1301.3781.pdf) from Mikolov et al.
 * [NIPS paper](http://papers.nips.cc/paper/5021-distributed-representations-of-words-and-phrases-and-their-compositionality.pdf) with improvements for word2vec also from Mikolov et al.
 * An [implementation of word2vec](http://www.thushv.com/natural_language_processing/word2vec-part-1-nlp-with-deep-learning-with-tensorflow-skip-gram/) from Thushan Ganegedara
@@ -62,7 +62,7 @@ if not isfile(dataset_filename):
 if not isdir(dataset_folder_path):
     with zipfile.ZipFile(dataset_filename) as zip_ref:
         zip_ref.extractall(dataset_folder_path)
-        
+
 with open('data/text8') as f:
     text = f.read()
 ```
@@ -98,7 +98,7 @@ int_words = [vocab_to_int[word] for word in words]
 
 ## Subsampling
 
-Words that show up often such as "the", "of", and "for" don't provide much context to the nearby words. If we discard some of them, we can remove some of the noise from our data and in return get faster training and better representations. This process is called subsampling by Mikolov. For each word $w_i$ in the training set, we'll discard it with probability given by 
+Words that show up often such as "the", "of", and "for" don't provide much context to the nearby words. If we discard some of them, we can remove some of the noise from our data and in return get faster training and better representations. This process is called subsampling by Mikolov. For each word $w_i$ in the training set, we'll discard it with probability given by
 
 $$ P(w_i) = 1 - \sqrt{\frac{t}{f(w_i)}} $$
 
@@ -119,9 +119,9 @@ train_words = [word for word in int_words if p_drop[word] < random.random()]
 
 ## Making batches
 
-Now that our data is in good shape, we need to get it into the proper form to pass it into our network. With the skip-gram architecture, for each word in the text, we want to grab all the words in a window around that word, with size $C$. 
+Now that our data is in good shape, we need to get it into the proper form to pass it into our network. With the skip-gram architecture, for each word in the text, we want to grab all the words in a window around that word, with size $C$.
 
->  From [Mikolov et al.](https://arxiv.org/pdf/1301.3781.pdf): 
+>  From [Mikolov et al.](https://arxiv.org/pdf/1301.3781.pdf):
 >
 > "Since the more distant words are usually less related to the current word than those close to it, we give less weight to the distant words by sampling less from those words in our training examples... If we choose $C = 5$, for each training word we will select randomly a number $R$ in range $< 1; C >$, and then use $R$ words from history and $R$ words from the future of the current word as correct labels."
 
@@ -129,12 +129,12 @@ Now that our data is in good shape, we need to get it into the proper form to pa
 ```python
 def get_target(words, idx, window_size=5):
     ''' Get a list of words in a window around an index. '''
-    
+
     R = np.random.randint(1, window_size+1)
     start = idx - R if (idx - R) > 0 else 0
     stop = idx + R
     target_words = set(words[start:idx] + words[idx+1:stop+1])
-    
+
     return list(target_words)
 ```
 
@@ -144,12 +144,12 @@ Here's a function that returns batches for our network. The idea is that it grab
 ```python
 def get_batches(words, batch_size, window_size=5):
     ''' Create a generator of word batches as a tuple (inputs, targets) '''
-    
+
     n_batches = len(words)//batch_size
-    
+
     # only full batches
     words = words[:n_batches*batch_size]
-    
+
     for idx in range(0, len(words), batch_size):
         x, y = [], []
         batch = words[idx:idx+batch_size]
@@ -159,7 +159,7 @@ def get_batches(words, batch_size, window_size=5):
             y.extend(batch_y)
             x.extend([batch_x]*len(batch_y))
         yield x, y
-    
+
 ```
 
 ## Building the graph
@@ -192,7 +192,7 @@ I don't actually need to do the matrix multiplication, I just need to select the
 
 ```python
 n_vocab = len(int_to_vocab)
-n_embedding = 200 # Number of embedding features 
+n_embedding = 200 # Number of embedding features
 with train_graph.as_default():
     embedding = tf.Variable(tf.random_uniform((n_vocab, n_embedding), -1, 1))
     embed = tf.nn.embedding_lookup(embedding, inputs)
@@ -209,12 +209,12 @@ n_sampled = 100
 with train_graph.as_default():
     softmax_w = tf.Variable(tf.truncated_normal((n_vocab, n_embedding), stddev=0.1))
     softmax_b = tf.Variable(tf.zeros(n_vocab))
-    
+
     # Calculate the loss using negative sampling
-    loss = tf.nn.sampled_softmax_loss(softmax_w, softmax_b, 
+    loss = tf.nn.sampled_softmax_loss(softmax_w, softmax_b,
                                       labels, embed,
                                       n_sampled, n_vocab)
-    
+
     cost = tf.reduce_mean(loss)
     optimizer = tf.train.AdamOptimizer().minimize(cost)
 ```
@@ -229,13 +229,13 @@ with train_graph.as_default():
     ## From Thushan Ganegedara's implementation
     valid_size = 16 # Random set of words to evaluate similarity on.
     valid_window = 100
-    # pick 8 samples from (0,100) and (1000,1100) each ranges. lower id implies more frequent 
+    # pick 8 samples from (0,100) and (1000,1100) each ranges. lower id implies more frequent
     valid_examples = np.array(random.sample(range(valid_window), valid_size//2))
-    valid_examples = np.append(valid_examples, 
+    valid_examples = np.append(valid_examples,
                                random.sample(range(1000,1000+valid_window), valid_size//2))
 
     valid_dataset = tf.constant(valid_examples, dtype=tf.int32)
-    
+
     # We use the cosine distance:
     norm = tf.sqrt(tf.reduce_sum(tf.square(embedding), 1, keep_dims=True))
     normalized_embedding = embedding / norm
@@ -267,14 +267,14 @@ with tf.Session(graph=train_graph) as sess:
         batches = get_batches(train_words, batch_size, window_size)
         start = time.time()
         for x, y in batches:
-            
+
             feed = {inputs: x,
                     labels: np.array(y)[:, None]}
             train_loss, _ = sess.run([cost, optimizer], feed_dict=feed)
-            
+
             loss += train_loss
-            
-            if iteration % 100 == 0: 
+
+            if iteration % 100 == 0:
                 end = time.time()
                 print("Epoch {}/{}".format(e, epochs),
                       "Iteration: {}".format(iteration),
@@ -282,7 +282,7 @@ with tf.Session(graph=train_graph) as sess:
                       "{:.4f} sec/batch".format((end-start)/100))
                 loss = 0
                 start = time.time()
-            
+
             if iteration % 1000 == 0:
                 # note that this is expensive (~20% slowdown if computed every 500 steps)
                 sim = similarity.eval()
@@ -295,7 +295,7 @@ with tf.Session(graph=train_graph) as sess:
                         close_word = int_to_vocab[nearest[k]]
                         log = '%s %s,' % (log, close_word)
                     print(log)
-            
+
             iteration += 1
     save_path = saver.save(sess, "checkpoints/text8.ckpt")
     embed_mat = sess.run(normalized_embedding)
@@ -1543,4 +1543,3 @@ for idx in range(viz_words):
 
 
 ![png](output_33_0.png)
-

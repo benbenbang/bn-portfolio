@@ -77,7 +77,7 @@ STATICFILES_DIRS = [
 ]
 ```
 
-## Create the web application: rekognition 
+## Create the web application: rekognition
 
 Let us use `startapp` to create our `rekogition` service:
 
@@ -286,5 +286,3 @@ To implement this feature, we will realize these functions in `view.py`
       	except Exception as e:
       		print('Something wrong:\n{0}'.format(e))
       ```
-
-       

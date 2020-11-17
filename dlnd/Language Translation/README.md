@@ -44,7 +44,7 @@ print('\n'.join(target_text.split('\n')[view_sentence_range[0]:view_sentence_ran
     Roughly the number of unique words: 227
     Number of sentences: 137861
     Average number of words in a sentence: 13.225277634719028
-    
+
     English sentences 0 to 10:
     new jersey is sometimes quiet during autumn , and it is snowy in april .
     the united states is usually chilly during july , and it is usually freezing in november .
@@ -56,7 +56,7 @@ print('\n'.join(target_text.split('\n')[view_sentence_range[0]:view_sentence_ran
     new jersey is busy during spring , and it is never hot in march .
     our least liked fruit is the lemon , but my least liked is the grape .
     the united states is sometimes busy during january , and it is sometimes warm in november .
-    
+
     French sentences 0 to 10:
     new jersey est parfois calme pendant l' automne , et il est neigeux en avril .
     les états-unis est généralement froid en juillet , et il gèle habituellement en novembre .
@@ -94,10 +94,10 @@ def text_to_ids(source_text, target_text, source_vocab_to_int, target_vocab_to_i
     :return: A tuple of lists (source_id_text, target_id_text)
     """
     # TODO: Implement Function
-    
+
     source_id_text = [[source_vocab_to_int[word] for word in sentence.split()] for sentence in source_text.split('\n')]
     target_id_text = [[target_vocab_to_int[word] for word in sentence.split()] + [target_vocab_to_int['<EOS>']] for sentence in target_text.split('\n')]
-    
+
     return (source_id_text, target_id_text)
 
 ```
@@ -258,7 +258,7 @@ def decoding_layer_train(encoder_state, dec_cell, dec_embed_input, sequence_leng
         # Training Decoder
         train_decoder_fn = tf.contrib.seq2seq.simple_decoder_fn_train(encoder_state)
         train_pred, _, _ = tf.contrib.seq2seq.dynamic_rnn_decoder(dec_cell, train_decoder_fn, dec_embed_input, sequence_length, scope=decoding_scope)
-    
+
         # Apply output function
         train_logits =  output_fn(tf.nn.dropout(train_pred, keep_prob))
     return train_logits
@@ -269,7 +269,7 @@ def decoding_layer_train(encoder_state, dec_cell, dec_embed_input, sequence_leng
 
 
 ### Decoding - Inference
-Create inference logits using [`tf.contrib.seq2seq.simple_decoder_fn_inference()`](https://www.tensorflow.org/api_docs/python/tf/contrib/seq2seq/simple_decoder_fn_inference) and [`tf.contrib.seq2seq.dynamic_rnn_decoder()`](https://www.tensorflow.org/api_docs/python/tf/contrib/seq2seq/dynamic_rnn_decoder). 
+Create inference logits using [`tf.contrib.seq2seq.simple_decoder_fn_inference()`](https://www.tensorflow.org/api_docs/python/tf/contrib/seq2seq/simple_decoder_fn_inference) and [`tf.contrib.seq2seq.dynamic_rnn_decoder()`](https://www.tensorflow.org/api_docs/python/tf/contrib/seq2seq/dynamic_rnn_decoder).
 
 
 ```python
@@ -282,7 +282,7 @@ def decoding_layer_infer(encoder_state, dec_cell, dec_embeddings, start_of_seque
     :param dec_embeddings: Decoder embeddings
     :param start_of_sequence_id: GO ID
     :param end_of_sequence_id: EOS Id
-    :param maximum_length: Maximum length of 
+    :param maximum_length: Maximum length of
     :param vocab_size: Size of vocabulary
     :param decoding_scope: TensorFlow Variable Scope for decoding
     :param output_fn: Function to apply the output layer
@@ -293,9 +293,9 @@ def decoding_layer_infer(encoder_state, dec_cell, dec_embeddings, start_of_seque
     with tf.variable_scope("decoding") as decoding_scope:
         # Inference Decoder
         infer_decoder_fn = tf.contrib.seq2seq.simple_decoder_fn_inference(
-        output_fn, encoder_state, dec_embeddings, start_of_sequence_id, end_of_sequence_id, 
+        output_fn, encoder_state, dec_embeddings, start_of_sequence_id, end_of_sequence_id,
         maximum_length, vocab_size)
-    
+
         inference_logits, _, _ = tf.contrib.seq2seq.dynamic_rnn_decoder(dec_cell, infer_decoder_fn, scope=decoding_scope)
     return tf.nn.dropout(inference_logits, keep_prob)
 
@@ -332,14 +332,14 @@ def decoding_layer(dec_embed_input, dec_embeddings, encoder_state, vocab_size, s
     :return: Tuple of (Training Logits, Inference Logits)
     """
     # TODO: Implement Function
-    with tf.variable_scope("decoding", reuse=None) as decoding_scope:          
+    with tf.variable_scope("decoding", reuse=None) as decoding_scope:
         output_fn = lambda x: tf.contrib.layers.fully_connected(x, vocab_size, None, scope=decoding_scope)
-        dec_cell = tf.contrib.rnn.MultiRNNCell([tf.contrib.rnn.BasicLSTMCell(rnn_size)] * num_layers)  
+        dec_cell = tf.contrib.rnn.MultiRNNCell([tf.contrib.rnn.BasicLSTMCell(rnn_size)] * num_layers)
         training_logits = decoding_layer_train(encoder_state, dec_cell, dec_embed_input, sequence_length, decoding_scope, output_fn, keep_prob)
-        
+
     with tf.variable_scope("decoding", reuse=True) as decoding_scope:
         inference_logits = decoding_layer_infer(encoder_state, dec_cell, dec_embeddings, target_vocab_to_int['<GO>'], target_vocab_to_int['<EOS>'], sequence_length-1, vocab_size, decoding_scope, output_fn, keep_prob)
-    
+
     return training_logits, inference_logits
 
 
@@ -388,7 +388,7 @@ def seq2seq_model(input_data, target_data, keep_prob, batch_size, sequence_lengt
 
     train, infer = decoding_layer(dec_embed_input, dec_embeddings, encoder_state, target_vocab_size, sequence_length, rnn_size,
                               num_layers, target_vocab_to_int, keep_prob)
-    
+
     return (train, infer)
 
 ```
@@ -442,7 +442,7 @@ with train_graph.as_default():
     input_data, targets, lr, keep_prob = model_inputs()
     sequence_length = tf.placeholder_with_default(max_target_sentence_length, None, name='sequence_length')
     input_shape = tf.shape(input_data)
-    
+
     train_logits, inference_logits = seq2seq_model(
         tf.reverse(input_data, [-1]), targets, keep_prob, batch_size, sequence_length, len(source_vocab_to_int), len(target_vocab_to_int),
         encoding_embedding_size, decoding_embedding_size, rnn_size, num_layers, target_vocab_to_int)
@@ -502,7 +502,7 @@ with tf.Session(graph=train_graph) as sess:
         for batch_i, (source_batch, target_batch) in enumerate(
                 helper.batch_data(train_source, train_target, batch_size)):
             start_time = time.time()
-            
+
             _, loss = sess.run(
                 [train_op, cost],
                 {input_data: source_batch,
@@ -510,14 +510,14 @@ with tf.Session(graph=train_graph) as sess:
                  lr: learning_rate,
                  sequence_length: target_batch.shape[1],
                  keep_prob: keep_probability})
-            
+
             batch_train_logits = sess.run(
                 inference_logits,
                 {input_data: source_batch, keep_prob: 1.0})
             batch_valid_logits = sess.run(
                 inference_logits,
                 {input_data: valid_source, keep_prob: 1.0})
-                
+
             train_acc = get_accuracy(target_batch, batch_train_logits)
             valid_acc = get_accuracy(np.array(valid_target), batch_valid_logits)
             end_time = time.time()
@@ -5973,7 +5973,7 @@ print('  French Words: {}'.format([target_int_to_vocab[i] for i in np.argmax(tra
     Input
       Word Ids:      [207, 86, 61, 122, 132, 172, 107]
       English Words: ['he', 'saw', 'a', 'old', 'yellow', 'truck', '.']
-    
+
     Prediction
       Word Ids:      [326, 76, 334, 247, 107, 16, 126, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
       French Words: ['la', 'fruit', 'est', 'le', 'vieux', 'camion', '.', '<PAD>', '<PAD>', '<PAD>', '<PAD>', '<PAD>', '<PAD>', '<PAD>', '<PAD>', '<PAD>', '<PAD>']

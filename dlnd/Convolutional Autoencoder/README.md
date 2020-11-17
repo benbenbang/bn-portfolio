@@ -43,7 +43,7 @@ Here our final encoder layer has size 4x4x8 = 128. The original images have size
 
 ### What's going on with the decoder
 
-Okay, so the decoder has these "Upsample" layers that we might not have seen before. First off, I'll discuss a bit what these layers *aren't*. Usually, we'll see **deconvolutional** layers used to increase the width and height of the layers. They work almost exactly the same as convolutional layers, but it reverse. A stride in the input layer results in a larger stride in the deconvolutional layer. For example, if we have a 3x3 kernel, a 3x3 patch in the input layer will be reduced to one unit in a convolutional layer. Comparatively, one unit in the input layer will be expanded to a 3x3 path in a deconvolutional layer. Deconvolution is often called "transpose convolution" which is what we'll find the TensorFlow API, with [`tf.nn.conv2d_transpose`](https://www.tensorflow.org/api_docs/python/tf/nn/conv2d_transpose). 
+Okay, so the decoder has these "Upsample" layers that we might not have seen before. First off, I'll discuss a bit what these layers *aren't*. Usually, we'll see **deconvolutional** layers used to increase the width and height of the layers. They work almost exactly the same as convolutional layers, but it reverse. A stride in the input layer results in a larger stride in the deconvolutional layer. For example, if we have a 3x3 kernel, a 3x3 patch in the input layer will be reduced to one unit in a convolutional layer. Comparatively, one unit in the input layer will be expanded to a 3x3 path in a deconvolutional layer. Deconvolution is often called "transpose convolution" which is what we'll find the TensorFlow API, with [`tf.nn.conv2d_transpose`](https://www.tensorflow.org/api_docs/python/tf/nn/conv2d_transpose).
 
 However, deconvolutional layers can lead to artifacts in the final images, such as checkerboard patterns. This is due to overlap in the kernels which can be avoided by setting the stride and kernel size equal. In [this Distill article](http://distill.pub/2016/deconv-checkerboard/) from Augustus Odena, *et al*, the authors show that these checkerboard artifacts can be avoided by resizing the layers using nearest neighbor or bilinear interpolation (upsampling) followed by a convolutional layer. In TensorFlow, this is easily done with [`tf.image.resize_images`](https://www.tensorflow.org/versions/r1.1/api_docs/python/tf/image/resize_images), followed by a convolution. Be sure to read the Distill article to get a better understanding of deconvolutional layers and why we're using upsampling.
 
@@ -213,12 +213,12 @@ for e in range(epochs):
         batch = mnist.train.next_batch(batch_size)
         # Get images from the batch
         imgs = batch[0].reshape((-1, 28, 28, 1))
-        
+
         # Add random noise to the input images
         noisy_imgs = imgs + noise_factor * np.random.randn(*imgs.shape)
         # Clip the images to be between 0 and 1
         noisy_imgs = np.clip(noisy_imgs, 0., 1.)
-        
+
         # Noisy images as inputs, original images as targets
         batch_cost, _ = sess.run([cost, opt], feed_dict={inputs_: noisy_imgs,
                                                          targets_: imgs})
@@ -251,4 +251,3 @@ fig.tight_lawet(pad=0.1)
 
 
 ![png](output_16_0.png)
-

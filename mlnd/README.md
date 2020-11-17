@@ -65,5 +65,3 @@ Free-Form Visualization
 Reflection
 
 Improvement
-
-

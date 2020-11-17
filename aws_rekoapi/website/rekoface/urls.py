@@ -13,12 +13,14 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
+# pypi/conda library
 from django.conf.urls import url
 from django.contrib import admin
+
 from .views import index, register, rekognize
 
 urlpatterns = [
-    url(r'^$', index, name='rekoface'),
-    url(r'^register/', register, name="Register"),
-    url(r'^rekognize/', rekognize, name="Rekognize")
+    url(r"^$", index, name="rekoface"),
+    url(r"^register/", register, name="Register"),
+    url(r"^rekognize/", rekognize, name="Rekognize"),
 ]

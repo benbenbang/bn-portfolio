@@ -16,7 +16,7 @@ import flash.utils.ByteArray;
 
 /**
  * A utility class to encode a String or ByteArray as a Base64 encoded String.
- *  
+ *
  *  @langversion 3.0
  *  @playerversion Flash 9
  *  @playerversion AIR 1.1
@@ -32,7 +32,7 @@ public class Base64Encoder
 
     /**
      *  Constant definition for the string "UTF-8".
-     *  
+     *
      *  @langversion 3.0
      *  @playerversion Flash 9
      *  @playerversion AIR 1.1
@@ -43,9 +43,9 @@ public class Base64Encoder
     /**
      * The character codepoint to be inserted into the encoded output to
      * denote a new line if <code>insertNewLines</code> is true.
-     * 
+     *
      * The default is <code>10</code> to represent the line feed <code>\n</code>.
-     *  
+     *
      *  @langversion 3.0
      *  @playerversion Flash 9
      *  @playerversion AIR 1.1
@@ -61,7 +61,7 @@ public class Base64Encoder
 
     /**
      * Constructor.
-     *  
+     *
      *  @langversion 3.0
      *  @playerversion Flash 9
      *  @playerversion AIR 1.1
@@ -83,9 +83,9 @@ public class Base64Encoder
      * A Boolean flag to control whether the sequence of characters specified
      * for <code>Base64Encoder.newLine</code> are inserted every 76 characters
      * to wrap the encoded output.
-     * 
+     *
      * The default is true.
-     *  
+     *
      *  @langversion 3.0
      *  @playerversion Flash 9
      *  @playerversion AIR 1.1
@@ -123,11 +123,11 @@ public class Base64Encoder
      * an internal buffer. Subsequent calls to this method add on to the
      * internal buffer. After all data have been encoded, call
      * <code>toString()</code> to obtain a Base64 encoded String.
-     * 
+     *
      * @param data The String to encode.
      * @param offset The character position from which to start encoding.
      * @param length The number of characters to encode from the offset.
-     *  
+     *
      *  @langversion 3.0
      *  @playerversion Flash 9
      *  @playerversion AIR 1.1
@@ -163,13 +163,13 @@ public class Base64Encoder
 
     /**
      * Encodes the UTF-8 bytes of a String in Base64 and adds the result to an
-     * internal buffer. The UTF-8 information does not contain a length prefix. 
+     * internal buffer. The UTF-8 information does not contain a length prefix.
      * Subsequent calls to this method add on to the internal buffer. After all
      * data have been encoded, call <code>toString()</code> to obtain a Base64
      * encoded String.
-     * 
+     *
      * @param data The String to encode.
-     *  
+     *
      *  @langversion 3.0
      *  @playerversion Flash 9
      *  @playerversion AIR 1.1
@@ -188,11 +188,11 @@ public class Base64Encoder
      * Subsequent calls to this method add on to the internal buffer. After all
      * data have been encoded, call <code>toString()</code> to obtain a
      * Base64 encoded String.
-     * 
+     *
      * @param data The ByteArray to encode.
      * @param offset The index from which to start encoding.
      * @param length The number of bytes to encode from the offset.
-     *  
+     *
      *  @langversion 3.0
      *  @playerversion Flash 9
      *  @playerversion AIR 1.1
@@ -245,7 +245,7 @@ public class Base64Encoder
 
     /**
      * Clears all buffers and resets the encoder to its initial state.
-     *  
+     *
      *  @langversion 3.0
      *  @playerversion Flash 9
      *  @playerversion AIR 1.1
@@ -264,11 +264,11 @@ public class Base64Encoder
 
     /**
      * Returns the current buffer as a Base64 encoded String. Note that
-     * calling this method also clears the buffer and resets the 
+     * calling this method also clears the buffer and resets the
      * encoder to its initial state.
-     * 
+     *
      * @return The Base64 encoded String.
-     *  
+     *
      *  @langversion 3.0
      *  @playerversion Flash 9
      *  @playerversion AIR 1.1
@@ -328,7 +328,7 @@ public class Base64Encoder
 
     /**
      * An Array of buffer Arrays.
-     *  
+     *
      *  @langversion 3.0
      *  @playerversion Flash 9
      *  @playerversion AIR 1.1
@@ -343,7 +343,7 @@ public class Base64Encoder
      * This value represents a safe number of characters (i.e. arguments) that
      * can be passed to String.fromCharCode.apply() without exceeding the AVM+
      * stack limit.
-     * 
+     *
      * @private
      */
     public static const MAX_BUFFER_SIZE:uint = 32767;

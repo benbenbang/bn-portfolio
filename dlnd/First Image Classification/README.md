@@ -77,7 +77,7 @@ helper.display_stats(cifar10_dataset_folder_path, batch_id, sample_id)
     Samples: 10000
     Label Counts: {0: 1005, 1: 974, 2: 1032, 3: 1016, 4: 999, 5: 937, 6: 1030, 7: 1001, 8: 1025, 9: 981}
     First 20 Labels: [6, 9, 9, 4, 1, 1, 2, 7, 8, 3, 4, 7, 7, 2, 9, 9, 9, 3, 2, 6]
-    
+
     Example of Image 5:
     Image - Min Value: 0 Max Value: 252
     Image - Shape: (32, 32, 3)
@@ -101,7 +101,7 @@ def normalize(x):
     : return: Numpy array of normalize data
     """
     # TODO: Implement Function
-    
+
     x = x.astype(np.float)
     x = np.multiply(x,1/255)
 
@@ -256,7 +256,7 @@ def conv2d_maxpool(x_tensor, conv_num_outputs, conv_ksize, conv_strides, pool_ks
     : return: A tensor that represents convolution and max pooling of x_tensor
     """
     # TODO: Implement Function
-    
+
     # Creat Weights and Bias
     conv_x = x_tensor
     weights = tf.Variable(tf.truncated_normal([conv_ksize[0], conv_ksize[1], int(conv_x.shape[3]), conv_num_outputs], stddev=0.01))
@@ -268,7 +268,7 @@ def conv2d_maxpool(x_tensor, conv_num_outputs, conv_ksize, conv_strides, pool_ks
     conv_layer = tf.nn.conv2d(conv_x, weights, strides, padding)
     conv_layer = tf.nn.bias_add(conv_layer, bias)
     conv_layer = tf.nn.relu(conv_layer)
-    
+
     # max_pool
     maxpool_x = conv_layer
     maxpool_ksize = [1, pool_ksize[0], pool_ksize[1] ,1]
@@ -284,7 +284,7 @@ tests.test_con_pool(conv2d_maxpool)
 
 
 ### Flatten Layer
-Implement the `flatten` function to change the dimension of `x_tensor` from a 4-D tensor to a 2-D tensor.  The output should be the shape (*Batch Size*, *Flattened Image Size*). 
+Implement the `flatten` function to change the dimension of `x_tensor` from a 4-D tensor to a 2-D tensor.  The output should be the shape (*Batch Size*, *Flattened Image Size*).
 
 
 ```python
@@ -362,7 +362,7 @@ Implement the function `conv_net` to create a convolutional neural network model
 * Apply 1, 2, or 3 Fully Connected Layers
 * Apply an Output Layer
 * Return the output
-* Apply [TensorFlow's Dropout](https://www.tensorflow.org/api_docs/python/tf/nn/dropout) to one or more layers in the model using `keep_prob`. 
+* Apply [TensorFlow's Dropout](https://www.tensorflow.org/api_docs/python/tf/nn/dropout) to one or more layers in the model using `keep_prob`.
 
 
 ```python
@@ -378,16 +378,16 @@ def conv_net(x, keep_prob):
     # Function Definition from Above:
     #    conv2d_maxpool(x_tensor, conv_num_outputs, conv_ksize, conv_strides, pool_ksize, pool_strides)
     layer_inputs = x
-    
+
     # Layer1
     layer_conv1 = conv2d_maxpool(layer_inputs, 32, [2,2], [1,1], [2,2], [2,2])
-    
+
     # Layer2
     layer_conv2 = conv2d_maxpool(layer_conv1, 32, [3,3], [1,1], [2,2], [2,2])
-    
+
     # Layer3
     layer_conv3 = conv2d_maxpool(layer_conv2, 64, [3,3], [1,1], [2,2], [2,2])
-    
+
 
     # TODO: Apply a Flatten Layer
     # Function Definition from Above:
@@ -406,7 +406,7 @@ def conv_net(x, keep_prob):
     # Function Definition from Above:
     #   output(x_tensor, num_outputs)
     output_ = output(layer_fc, 10)
-    
+
     # TODO: return output
     return output_
 
@@ -466,7 +466,7 @@ def train_neural_network(session, optimizer, keep_probability, feature_batch, la
     """
     # TODO: Implement Function
     session.run(optimizer, feed_dict={x: feature_batch, y: label_batch, keep_prob: keep_probability})
-        
+
 tests.test_train_nn(train_neural_network)
 ```
 
@@ -522,7 +522,7 @@ print('Checking the Training on a Single Batch...')
 with tf.Session() as sess:
     # Initializing the variables
     sess.run(tf.global_variables_initializer())
-    
+
     # Training cycle
     for epoch in range(epochs):
         batch_i = 1
@@ -746,7 +746,7 @@ print('Training...')
 with tf.Session() as sess:
     # Initializing the variables
     sess.run(tf.global_variables_initializer())
-    
+
     # Training cycle
     for epoch in range(epochs):
         # Loop over all batches
@@ -756,7 +756,7 @@ with tf.Session() as sess:
                 train_neural_network(sess, optimizer, keep_probability, batch_features, batch_labels)
             print('Epoch {:>2}, CIFAR-10 Batch {}:  '.format(epoch + 1, batch_i), end='')
             print_stats(sess, batch_features, batch_labels, cost, accuracy)
-            
+
     # Save Model
     saver = tf.train.Saver()
     save_path = saver.save(sess, save_model_path)
@@ -1810,11 +1810,11 @@ def test_model():
         loaded_keep_prob = loaded_graph.get_tensor_by_name('keep_prob:0')
         loaded_logits = loaded_graph.get_tensor_by_name('logits:0')
         loaded_acc = loaded_graph.get_tensor_by_name('accuracy:0')
-        
+
         # Get accuracy in batches for memory limitations
         test_batch_acc_total = 0
         test_batch_count = 0
-        
+
         for train_feature_batch, train_label_batch in helper.batch_features_labels(test_features, test_labels, batch_size):
             test_batch_acc_total += sess.run(
                 loaded_acc,
@@ -1835,7 +1835,7 @@ test_model()
 ```
 
     Testing Accuracy: 0.6602308917197452
-​    
+​
 
 
 

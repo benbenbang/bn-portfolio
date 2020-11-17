@@ -77,7 +77,7 @@ Host the `webcam.js` and `webcam.swf` files on your web server (both in the same
 
 	<script language="JavaScript">
 		Webcam.attach( '#my_camera' );
-		
+
 		function take_snapshot() {
 			Webcam.snap( function(data_uri) {
 				document.getElementById('my_result').innerHTML = '<img src="'+data_uri+'"/>';
@@ -135,7 +135,7 @@ You can also set multiple parameters at once by passing in an object, like this:
 		flip_horiz: true,
 		fps: 45
 	});
-	
+
 	// Attach camera here
 ```
 
@@ -176,7 +176,7 @@ If you would prefer that WebcamJS simply copy the image into your own canvas, it
 
 ```javascript
 	// assumes 'myCanvas' is a reference to your own canvas object, at the correct size
-	
+
 	Webcam.snap( function() {
 		// the webcam image is now in your own canvas
 	}, myCanvas );
@@ -191,7 +191,7 @@ WebcamJS will automatically size the live camera viewer based on the DOM element
 		width: 320,
 		height: 240
 	});
-	
+
 	// Attach camera here
 ```
 
@@ -204,7 +204,7 @@ The size of the captured JPEG / PNG image is set to match the live camera viewer
 		dest_width: 640,
 		dest_height: 480,
 	});
-	
+
 	// Attach camera here
 ```
 
@@ -221,7 +221,7 @@ WebcamJS can also crop the final image for you, to any dimensions you like.  Thi
 		crop_width: 240,
 		crop_height: 240
 	});
-	
+
 	// Attach camera here
 ```
 
@@ -239,7 +239,7 @@ If you want, WebcamJS can "flip" (mirror) both the live preview and captured ima
 		height: 240,
 		flip_horiz: true
 	});
-	
+
 	// Attach camera here
 ```
 
@@ -307,12 +307,12 @@ Example:
 	Webcam.on( 'load', function() {
 		// library is loaded
 	} );
-	
+
 	Webcam.on( 'live', function() {
 		// camera is live, showing preview image
 		// (and user has allowed access)
 	} );
-	
+
 	Webcam.on( 'error', function(err) {
 		// an error occurred (see 'err')
 	} );
@@ -329,13 +329,13 @@ The `Webcam.snap()` function delivers your image by way of a client-side JavaScr
 ```javascript
 	Webcam.snap( function(data_uri) {
 		// snap complete, image data is in 'data_uri'
-		
+
 		Webcam.upload( data_uri, 'myscript.php', function(code, text) {
 			// Upload complete!
 			// 'code' will be the HTTP response code from the server, e.g. 200
 			// 'text' will be the raw response content
 		} );
-		
+
 	} );
 ```
 
@@ -367,20 +367,20 @@ If you want to track progress while your image is uploading, you can register an
 
 ```javascript
 	Webcam.snap( function(data_uri) {
-	
+
 		Webcam.on( 'uploadProgress', function(progress) {
 			// Upload in progress
 			// 'progress' will be between 0.0 and 1.0
 		} );
-		
+
 		Webcam.on( 'uploadComplete', function(code, text) {
 			// Upload complete!
 			// 'code' will be the HTTP response code from the server, e.g. 200
 			// 'text' will be the raw response content
 		} );
-		
+
 		Webcam.upload( data_uri, 'myscript.php' );
-		
+
 	} );
 ```
 
@@ -403,7 +403,7 @@ Then, when you snap your picture, stuff the Data URI into the form field value (
 ```javascript
 	Webcam.snap( function(data_uri) {
 		var raw_image_data = data_uri.replace(/^data\:image\/\w+\;base64\,/, '');
-		
+
 		document.getElementById('mydata').value = raw_image_data;
 		document.getElementById('myform').submit();
 	} );
@@ -414,7 +414,7 @@ Finally, in your server-side script, grab the form data as if it were a plain fo
 ```php
 	$encoded_data = $_POST['mydata'];
 	$binary_data = base64_decode( $encoded_data );
-	
+
 	// save to server (beware of permissions)
 	$result = file_put_contents( 'webcam.jpg', $binary_data );
 	if (!$result) die("Could not save image!  Check file permissions.");

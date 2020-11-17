@@ -5,18 +5,18 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
-<meta name="keywords" content=""> 
+<meta name="keywords" content="">
 <meta name="Author" content="Ben Chen">
 <meta name="Powered" content="Ben Chen">
-<meta name="copyright" content="Copyright ©  All Rights Reserved."> 
+<meta name="copyright" content="Copyright ©  All Rights Reserved.">
 <meta name="description" content="">
 <title>{% block head_title %}RekoFace{% endblock head_title %}</title>
-	
+
 	<!-- CSS  -->
 	<link href='{% static "css/bootstrap/css/bootstrap.min.css" %}' rel="stylesheet" media="screen">
-	<!-- Modernizer and IE specyfic files --> 
+	<!-- Modernizer and IE specyfic files -->
 	<!--<script src="js/modernizr.custom.js"></script>-->
-	
+
 </head>
 
 <body>
@@ -31,7 +31,7 @@
 				<br>
 				<div id="results"></div>
 				<!-- A button for taking snaps -->
-				<br>    
+				<br>
 				<form class="form" enctype="multipart/form-data">
 					<div class="row">
 						<div class="col-lg-6">
@@ -50,7 +50,7 @@
 					<input type=button value="Rekongize" onClick="rekognize()" class="btn btn-primary">
 				</form>
 			</div>
-		
+
 			<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
 				<p class="h5">Feedback from API: </p>
 				<blockquote class="blockquote">
@@ -92,8 +92,8 @@
 			// take snapshot and get image data
 			Webcam.snap(function(data_uri) {
 				// display results in page
-				document.getElementById('results').innerHTML = 
-					'<p><strong>Here is your image:</strong></p>' + 
+				document.getElementById('results').innerHTML =
+					'<p><strong>Here is your image:</strong></p>' +
 					'<img id="register_img" src="'+data_uri+'"/>';
 
 				$.ajax({
@@ -105,7 +105,7 @@
 					dataType: 'json',
 					success: function (data) {
 						//alert("");
-						document.getElementById('reko_results').innerHTML = 
+						document.getElementById('reko_results').innerHTML =
 							'<ul><li>Age: ' + data.Age + '</li>'
 							+ '<li>Gender: ' + data.Gender + '</li>'
 							+ '<li>Emotions: ' + data.Emotions + '</li>'
@@ -132,10 +132,10 @@
 			// take snapshot and get image data
 			Webcam.snap(function(data_uri) {
 				// display results in page
-				document.getElementById('results').innerHTML = 
-					'<p><strong>Here is your image:</strong></p>' + 
+				document.getElementById('results').innerHTML =
+					'<p><strong>Here is your image:</strong></p>' +
 					'<img id="register_img" src="'+data_uri+'"/>';
-					
+
 				$.ajax({
 					url: 'rekognize/',
 					data: {
@@ -145,7 +145,7 @@
 					dataType: 'json',
 					success: function (data) {
 						//alert(data['is_saved']);
-						document.getElementById('reko_results').innerHTML = 
+						document.getElementById('reko_results').innerHTML =
 								'<ul><li>Response: ' + data.Response + '</li>'
 								+ '<li>Similarity: ' + data.similarity + '</li>'
 								+ '<li>Bool ' + data.knowIf + '</li>';

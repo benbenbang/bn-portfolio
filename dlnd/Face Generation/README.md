@@ -23,7 +23,7 @@ helper.download_extract('celeba', data_dir)
 
 ## Explore the Data
 ### MNIST
-The [MNIST](http://yann.lecun.com/exdb/mnist/) dataset contains images of handwritten digits. I can view the first number of examples by changing `show_n_images`. 
+The [MNIST](http://yann.lecun.com/exdb/mnist/) dataset contains images of handwritten digits. I can view the first number of examples by changing `show_n_images`.
 
 
 ```python
@@ -131,7 +131,7 @@ def model_inputs(image_width, image_height, image_channels, z_dim):
     image = tf.placeholder(tf.float32, (None, image_width, image_height, image_channels), name='image')
     z_dim = tf.placeholder(tf.float32, (None, z_dim), name='z_dim')
     learning_rate = tf.placeholder(tf.float32, None, name='learning_rate')
-    
+
     return (image, z_dim, learning_rate)
 
 tests.test_model_inputs(model_inputs)
@@ -154,27 +154,27 @@ def discriminator(images, reuse=False):
     """
     # TODO: Implement Function
     alpha = 0.2
-    
+
     with tf.variable_scope('discriminator' ,reuse=reuse):
         x1 = tf.layers.conv2d(images, 64, 5, strides=2, padding='same',
                              kernel_initializer=tf.random_normal_initializer(stddev=0.02))
         x1 = tf.maximum(alpha*x1, x1)
-        
+
         x2 = tf.layers.conv2d(x1, 128, 5, strides=2, padding='same',
                              kernel_initializer=tf.random_normal_initializer(stddev=0.02))
         x2 = tf.layers.batch_normalization(x2, training=True)
         x2 = tf.maximum(alpha*x2, x2)
-        
+
         x3 = tf.layers.conv2d(x1, 256, 5, strides=2, padding='same',
                              kernel_initializer=tf.random_normal_initializer(stddev=0.02))
         x3 = tf.layers.batch_normalization(x3, training=True)
         x3 = tf.maximum(alpha*x3, x3)
-        
+
         flat = tf.reshape(x3, (-1, 7*7*256))
-        logits = tf.layers.dense(flat, 1, 
+        logits = tf.layers.dense(flat, 1,
                                 kernel_initializer=tf.random_normal_initializer(stddev=0.02))
         out = tf.sigmoid(logits)
-        
+
     return out, logits
 
 tests.test_discriminator(discriminator, tf)
@@ -198,7 +198,7 @@ def generator(z, out_channel_dim, is_train=True):
     """
     # TODO: Implement Function
     alpha = 0.2
-    
+
     with tf.variable_scope('generator', reuse= not is_train):
         # First fully connected layer
         x1 = tf.layers.dense(z, 7*7*512)
@@ -206,19 +206,19 @@ def generator(z, out_channel_dim, is_train=True):
         x1 = tf.layers.batch_normalization(x1, training=is_train)
         x1 = tf.maximum(alpha*x1, x1)
         # 7x7x512 now
-        
+
         x2 = tf.layers.conv2d_transpose(x1, 256, 5, strides=2, padding='same',
                                            kernel_initializer=tf.random_normal_initializer(stddev=0.02))
         x2 = tf.layers.batch_normalization(x2, training=is_train)
         x2 = tf.maximum(alpha*x2, x2)
         # 14x14 now
-        
+
         x3 = tf.layers.conv2d_transpose(x2, 128, 5, strides=2, padding='same',
                                            kernel_initializer=tf.random_normal_initializer(stddev=0.02))
         x3 = tf.layers.batch_normalization(x3, training=is_train)
         x3 = tf.maximum(alpha*x3, x3)
         # 28x28 now
-        
+
         logits = tf.layers.conv2d_transpose(x3, out_channel_dim, 5, strides=1, padding='same',
                                            kernel_initializer=tf.random_normal_initializer(stddev=0.02))
         out = tf.tanh(logits)
@@ -258,7 +258,7 @@ def model_loss(input_real, input_z, out_channel_dim):
         tf.nn.sigmoid_cross_entropy_with_logits(logits=d_logits_fake, labels=tf.ones_like(d_model_fake)))
 
     d_loss = d_loss_real + d_loss_fake
-    
+
     return d_loss, g_loss
 
 tests.test_model_loss(model_loss)
@@ -290,7 +290,7 @@ def model_opt(d_loss, g_loss, learning_rate, beta1):
     with tf.control_dependencies(tf.get_collection(tf.GraphKeys.UPDATE_OPS)):
         d_train_opt = tf.train.AdamOptimizer(learning_rate, beta1=beta1).minimize(d_loss, var_list=d_vars)
         g_train_opt = tf.train.AdamOptimizer(learning_rate, beta1=beta1).minimize(g_loss, var_list=g_vars)
-    
+
     return d_train_opt, g_train_opt
 
 tests.test_model_opt(model_opt, tf)
@@ -358,28 +358,28 @@ def train(epoch_count, batch_size, z_dim, learning_rate, beta1, get_batches, dat
     input_real, input_z, l_rate = model_inputs(data_shape[1], data_shape[2], data_shape[3], z_dim)
     d_loss, g_loss = model_loss(input_real, input_z, data_shape[3])
     d_train_opt, g_train_opt = model_opt(d_loss, g_loss, l_rate, beta1)
-    
-    
+
+
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
         for epoch_i in range(epoch_count):
             for batch_images in get_batches(batch_size):
                 # TODO: Train Model
                 steps += 1
-                
+
                 batch_z = np.random.uniform(-1, 1, size=(batch_size, z_dim))
                 batch_images *= 2
-                
+
                 # Run optimizers
                 _ = sess.run(d_train_opt, feed_dict={
-                                                input_real: batch_images, 
-                                                input_z: batch_z, 
+                                                input_real: batch_images,
+                                                input_z: batch_z,
                                                 l_rate: learning_rate})
                 _ = sess.run(g_train_opt, feed_dict={
-                                                input_real: batch_images, 
-                                                input_z: batch_z, 
+                                                input_real: batch_images,
+                                                input_z: batch_z,
                                                 l_rate: learning_rate})
-                
+
                 if steps % 10 == 0:
                     # At the end of each epoch, get the losses and print them out
                     train_loss_d = d_loss.eval({input_z: batch_z, input_real: batch_images})
@@ -390,7 +390,7 @@ def train(epoch_count, batch_size, z_dim, learning_rate, beta1, get_batches, dat
                           "Generator Loss: {:.4f}".format(train_loss_g))
                     # Save losses to view after training
                     losses.append((train_loss_d, train_loss_g))
-                    
+
                 if steps % 100 == 0:
                     show_generator_output(sess, 10, input_z, data_shape[3], data_image_mode)
 ```

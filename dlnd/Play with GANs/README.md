@@ -5,7 +5,7 @@
 
 GANs were [first reported on](https://arxiv.org/abs/1406.2661) in 2014 from Ian Goodfellow and others in Yoshua Bengio's lab. Since then, GANs have exploded in popularity. Here are a few examples to check out:
 
-* [Pix2Pix](https://affinelayer.com/pixsrv/) 
+* [Pix2Pix](https://affinelayer.com/pixsrv/)
 * [CycleGAN](https://github.com/junyanz/CycleGAN)
 * [A whole list](https://github.com/wiseodd/generative-models)
 
@@ -50,9 +50,9 @@ First I need to create the inputs for our graph. I'll need two inputs, one for t
 
 ```python
 def model_inputs(real_dim, z_dim):
-    inputs_real = tf.placeholder(tf.float32, (None, real_dim), name='input_real') 
+    inputs_real = tf.placeholder(tf.float32, (None, real_dim), name='input_real')
     inputs_z = tf.placeholder(tf.float32, (None, z_dim), name='input_z')
-    
+
     return inputs_real, inputs_z
 ```
 
@@ -92,11 +92,11 @@ def generator(z, out_dim, n_units=128, reuse=False, alpha=0.01):
         h1 = tf.layers.dense(z, n_units, activation=None)
         # Leaky ReLU
         h1 = tf.maximum(alpha * h1, h1)
-        
+
         # Logits and tanh output
         logits = tf.layers.dense(h1, out_dim, activation=None)
         out = tf.tanh(logits)
-        
+
         return out
 ```
 
@@ -112,10 +112,10 @@ def discriminator(x, n_units=128, reuse=False, alpha=0.01):
         h1 = tf.layers.dense(x, n_units, activation=None)
         # Leaky ReLU
         h1 = tf.maximum(alpha * h1, h1)
-        
+
         logits = tf.layers.dense(h1, 1, activation=None)
         out = tf.sigmoid(logits)
-        
+
         return out, logits
 ```
 
@@ -132,7 +132,7 @@ g_hidden_size = 128
 d_hidden_size = 128
 # Leak factor for leaky ReLU
 alpha = 0.01
-# Smoothing 
+# Smoothing
 smooth = 0.1
 ```
 
@@ -162,7 +162,7 @@ d_model_fake, d_logits_fake = discriminator(g_model, reuse=True)
 
 ## Discriminator and Generator Losses
 
-Now we need to calculate the losses, which is a little tricky. For the discriminator, the total loss is the sum of the losses for real and fake images, `d_loss = d_loss_real + d_loss_fake`. The losses will by sigmoid cross-entropys, which we can get with `tf.nn.sigmoid_cross_entropy_with_logits`. I'll also wrap that in `tf.reduce_mean` to get the mean for all the images in the batch. So the losses will look something like 
+Now we need to calculate the losses, which is a little tricky. For the discriminator, the total loss is the sum of the losses for real and fake images, `d_loss = d_loss_real + d_loss_fake`. The losses will by sigmoid cross-entropys, which we can get with `tf.nn.sigmoid_cross_entropy_with_logits`. I'll also wrap that in `tf.reduce_mean` to get the mean for all the images in the batch. So the losses will look something like
 
 ```python
 tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=logits, labels=labels))
@@ -178,10 +178,10 @@ Finally, the generator losses are using `d_logits_fake`, the fake image logits. 
 ```python
 # Calculate losses
 d_loss_real = tf.reduce_mean(
-                  tf.nn.sigmoid_cross_entropy_with_logits(logits=d_logits_real, 
+                  tf.nn.sigmoid_cross_entropy_with_logits(logits=d_logits_real,
                                                           labels=tf.ones_like(d_logits_real) * (1 - smooth)))
 d_loss_fake = tf.reduce_mean(
-                  tf.nn.sigmoid_cross_entropy_with_logits(logits=d_logits_fake, 
+                  tf.nn.sigmoid_cross_entropy_with_logits(logits=d_logits_fake,
                                                           labels=tf.zeros_like(d_logits_real)))
 d_loss = d_loss_real + d_loss_fake
 
@@ -231,28 +231,28 @@ with tf.Session() as sess:
     for e in range(epochs):
         for ii in range(mnist.train.num_examples//batch_size):
             batch = mnist.train.next_batch(batch_size)
-            
+
             # Get images, reshape and rescale to pass to D
             batch_images = batch[0].reshape((batch_size, 784))
             batch_images = batch_images*2 - 1
-            
+
             # Sample random noise for G
             batch_z = np.random.uniform(-1, 1, size=(batch_size, z_size))
-            
+
             # Run optimizers
             _ = sess.run(d_train_opt, feed_dict={input_real: batch_images, input_z: batch_z})
             _ = sess.run(g_train_opt, feed_dict={input_z: batch_z})
-        
+
         # At the end of each epoch, get the losses and print them out
         train_loss_d = sess.run(d_loss, {input_z: batch_z, input_real: batch_images})
         train_loss_g = g_loss.eval({input_z: batch_z})
-            
+
         print("Epoch {}/{}...".format(e+1, epochs),
               "Discriminator Loss: {:.4f}...".format(train_loss_d),
-              "Generator Loss: {:.4f}".format(train_loss_g))    
+              "Generator Loss: {:.4f}".format(train_loss_g))
         # Save losses to view after training
         losses.append((train_loss_d, train_loss_g))
-        
+
         # Sample from generator as we're training for viewing afterwards
         sample_z = np.random.uniform(-1, 1, size=(16, z_size))
         gen_samples = sess.run(
@@ -301,7 +301,7 @@ def view_samples(epoch, samples):
         ax.xaxis.set_visible(False)
         ax.yaxis.set_visible(False)
         im = ax.imshow(img.reshape((28,28)), cmap='Greys_r')
-    
+
     return fig, axes
 ```
 
@@ -361,4 +361,3 @@ _ = view_samples(0, [gen_samples])
 
 
 ![png](output_31_0.png)
-

@@ -1,14 +1,14 @@
 
-# Character Sequence to Sequence 
+# Character Sequence to Sequence
 In this project, I'll build a model that takes in a sequence of letters, and outputs a sorted version of that sequence. I'll do that using what we've learned so far about Sequence to Sequence models.
 
 <img src="images/sequence-to-sequence.jpg"/>
 
 
-## Dataset 
+## Dataset
 
 The dataset lives in the /data/ folder. At the moment, it is made up of the following files:
- * **letters_source.txt**: The list of input letter sequences. Each sequence is its own line. 
+ * **letters_source.txt**: The list of input letter sequences. Each sequence is its own line.
  * **letters_target.txt**: The list of target sequences we'll use in the training process. Each sequence here is a response to the input sequence in letters_source.txt with the same line number.
 
 
@@ -69,7 +69,7 @@ target_sentences[:50].split('\n')
 
 
 ## Preprocess
-To do anything useful with it, we'll need to turn the characters into a list of integers: 
+To do anything useful with it, we'll need to turn the characters into a list of integers:
 
 
 ```python
@@ -123,7 +123,7 @@ sequence_length = max(
         [len(sentence) for sentence in source_letter_ids] + [len(sentence) for sentence in target_letter_ids])
 
 # Pad all sequences up to sequence length
-source_ids, target_ids = pad_id_sequences(source_letter_ids, source_letter_to_int, 
+source_ids, target_ids = pad_id_sequences(source_letter_ids, source_letter_to_int,
                                           target_letter_ids, target_letter_to_int, sequence_length)
 
 print("Sequence Length")
@@ -294,7 +294,7 @@ with tf.variable_scope("decoding") as decoding_scope:
     train_decoder_fn = tf.contrib.seq2seq.simple_decoder_fn_train(enc_state)
     train_pred, _, _ = tf.contrib.seq2seq.dynamic_rnn_decoder(
         dec_cell, train_decoder_fn, dec_embed_input, sequence_length, scope=decoding_scope)
-    
+
     # Apply output function
     train_logits =  output_fn(train_pred)
 ```
@@ -302,14 +302,14 @@ with tf.variable_scope("decoding") as decoding_scope:
 #### Decoder During Inference
 - Reuse the weights the biases from the training decoder using [`tf.variable_scope("decoding", reuse=True)`](https://www.tensorflow.org/api_docs/python/tf/variable_scope)
 - Build the inference decoder using [`tf.contrib.seq2seq.simple_decoder_fn_inference`](https://www.tensorflow.org/api_docs/python/tf/contrib/seq2seq/simple_decoder_fn_inference) and [`tf.contrib.seq2seq.dynamic_rnn_decoder`](https://www.tensorflow.org/api_docs/python/tf/contrib/seq2seq/dynamic_rnn_decoder).
- - The output function is applied to the output in this step 
+ - The output function is applied to the output in this step
 
 
 ```python
 with tf.variable_scope("decoding", reuse=True) as decoding_scope:
     # Inference Decoder
     infer_decoder_fn = tf.contrib.seq2seq.simple_decoder_fn_inference(
-        output_fn, enc_state, dec_embeddings, target_letter_to_int['<s>'], target_letter_to_int['<\s>'], 
+        output_fn, enc_state, dec_embeddings, target_letter_to_int['<s>'], target_letter_to_int['<\s>'],
         sequence_length - 1, target_vocab_size)
     inference_logits, _, _ = tf.contrib.seq2seq.dynamic_rnn_decoder(dec_cell, infer_decoder_fn, scope=decoding_scope)
 ```
@@ -5014,8 +5014,7 @@ print('  Chatbot Answer Words: {}'.format([target_int_to_letter[i] for i in np.a
     Input
       Word Ids:      [20, 18, 28, 28, 10, 0, 0]
       Input Words: ['h', 'e', 'l', 'l', 'o', '<pad>', '<pad>']
-    
+
     Prediction
       Word Ids:      [18, 20, 28, 28, 10, 0, 0]
       Chatbot Answer Words: ['e', 'h', 'l', 'l', 'o', '<pad>', '<pad>']
-

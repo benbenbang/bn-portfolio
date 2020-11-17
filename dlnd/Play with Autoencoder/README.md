@@ -83,7 +83,7 @@ opt = tf.train.AdamOptimizer(0.001).minimize(cost)
 sess = tf.Session()
 ```
 
-Here I'll write a bit of code to train the network. I'm not too interested in validation here, so I'll just monitor the training loss and the test loss afterwards. 
+Here I'll write a bit of code to train the network. I'm not too interested in validation here, so I'll just monitor the training loss and the test loss afterwards.
 
 Calling `mnist.train.next_batch(batch_size)` will return a tuple of `(images, labels)`. I're not concerned with the labels here, I just need the images. Otherwise this is pretty straightfoward training with TensorFlow. I initialize the variables with `sess.run(tf.global_variables_initializer())`. Then, run the optimizer and get the loss with `batch_cost, _ = sess.run([cost, opt], feed_dict=feed)`.
 
