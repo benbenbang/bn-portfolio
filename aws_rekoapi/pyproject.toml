@@ -9,7 +9,7 @@ python = "3.7.9"
 boto3 = "^1.16.19"
 click = "^7.1.2"
 Pillow = "^8.2.0"
-Jinja2 = "^2.11.2"
+Jinja2 = "^2.11.3"
 Django = "<2"
 
 [tool.poetry.dev-dependencies]
