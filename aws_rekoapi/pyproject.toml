@@ -10,7 +10,7 @@ boto3 = "^1.16.19"
 click = "^7.1.2"
 Pillow = "^8.2.0"
 Jinja2 = "^2.11.2"
-Django = "<2"
+Django = "<3"
 
 [tool.poetry.dev-dependencies]
 
