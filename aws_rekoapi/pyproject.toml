@@ -5,12 +5,13 @@ description = ""
 authors = ["Ben Chen <bn@benbenbang.io>"]
 
 [tool.poetry.dependencies]
-python = "3.7.9"
+python = "3.7.11"
 boto3 = "^1.16.19"
 click = "^7.1.2"
-Pillow = "^8.2.0"
+Pillow = ">=9"
 Jinja2 = "^2.11.3"
 Django = "<3"
+urllib3 = ">=1.26.5"
 
 [tool.poetry.dev-dependencies]
 
